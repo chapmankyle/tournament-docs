@@ -28,44 +28,71 @@
 
 \chapter{Introduction}
 
-The Cloud Tournament Engine (CTE) used in $3^{\text{rd}}$ year at Stellenbosch
+The Fail-Safe Cloud Tournament Engine (FSCTE) is an extension of the Cloud
+Tournament Engine (CTE) developed by Reece Murray in 2018, which was an extension
+of the Tournament Engine (TE) built on the Ingenious Framework\footnote{\url{https://bitbucket.org/skroon/ingenious-framework/src/master/}}
+(IF). The goal for the CTE was to allow people to play a turn-based game, provided
+it was supported in the IF, against each other in a match, where many matches
+made up a tournament. Multiple tournaments were then run to determine how good
+each player was. \\
+
+It was found that there were some major limitations to the CTE, such as minimal
+error reporting, lack of error recovery and an unmaintainable code base to name
+a few. As a result, there were situations that arose in which a player failure
+resulted in a failure of the entire tournament. This prompted the need for a
+version that was fail-safe and included error reporting and error recovery, as
+far as possible. The FSCTE aims to address these limitations and improve the
+overall system stability by being fail-safe, which means that if any error were
+to occur, the response to the error would cause as little harm to the overall
+system stability as possible.
+
+\section{Scope}
+
+The system used to manage the FSCTE is made up of multiple Docker\footnote{\url{https://docs.docker.com/engine/docker-overview/}}
+containers, which run each section of the FSCTE in their own separate environment.
+If some error occurs in a section of the system, it will not affect the other
+sections, since they are in separate environments. \\
+
+The FSCTE uses the following three main sections that are run in their own
+Docker containers:
+
+\begin{itemize}
+	\item \textbf{Web User Interface}: Allows a user to interact with the FSCTE.
+	\item \textbf{Database}: Used to store all the information relevant to the FSCTE.
+	\item \textbf{REST API}: Facilitates file upload to, and download from, the
+	web user interface.
+\end{itemize}
+
+\chapter{System Overview}
+
+\section{Ingenious Framework (IF)}
+
+The CTE used in $3^{\text{rd}}$ year at Stellenbosch
 University is \mbox{designed} to manage many Othello \cite{othello} tournaments,
 involving many players, concurrently. A user is able to view public tournaments,
 players, referees, schedulers, etc. and view \mbox{relevant} statistics for
 ongoing and completed tournaments. The admin, usually the \mbox{lecturer}, is
-able to add tournaments, schedulers and rankers.
+able to add tournaments, schedulers and rankers. \\
 
-\vspace{0.8em}
 A scheduler is used to schedule matches between two players in a round-robin
 \mbox{fashion}, where every player plays against every other player. After every player
 has played against every other player, the overall win-loss ratio can be calculated
 that can be used to \mbox{distinguish} between good, average and bad players. The
-win-loss ratio and the Elo rating \cite{elo} can be used in conjunction.
+win-loss ratio and the Elo rating \cite{elo} can be used in conjunction. \\
 
-\vspace{0.8em}
 A ranker is used to distinguish between the good and bad players by comparing
 the Elo of the two players, where every player starts on the same amount of Elo.
 For every win that a player has, they gain a certain amount of Elo and for every
 loss that a player has, they lost a certain amount of Elo. The amount gained or
 lost decreases for every match that the player plays, meaning that eventually
-the Elo rating will be a true reflection of the skill level of the player.
+the Elo rating will be a true reflection of the skill level of the player. \\
 
-\vspace{0.8em}
 A referee is used to monitor the moves that the two players make in a match and
 check if any player makes an invalid move or times out. One player sends a
 move to the referee, which then checks if the move is valid and only sends
 the move to the other player if the move made is valid. If the move made is
 invalid, or the player times out, the match will be forfeit and the last player
 to send a valid move becomes the winner.
-
-\vspace{0.8em}
-The current CTE was used in 2019, but it was found to have some major limitations.
-The web interface that is used is not user-friendly, there is minimal to no
-error reporting or error recovery, the code base is umaintainable and it
-relies on older technology. In many scenerios, a player failure results in
-a failed tournament when running the CTE.
-
-\chapter{System Overview}
 
 \chapter{Design and Implementation}
 
