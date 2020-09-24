@@ -1,7 +1,7 @@
 \documentclass[a4paper, 12pt]{report}
 
 \usepackage[style=numeric]{biblatex}
-\usepackage[margin=2.5cm]{geometry}
+\usepackage[margin=1.8cm]{geometry}
 \usepackage[utf8]{inputenc}
 \usepackage{graphicx}
 \usepackage{amsmath}
@@ -29,12 +29,12 @@
 \chapter{Introduction}
 
 The Fail-Safe Cloud Tournament Engine (FSCTE) is an extension of the Cloud
-Tournament Engine (CTE) developed by Reece Murray in 2018, which was an extension
+Tournament Engine (CTE) developed by Reece Murray in 2018, which is an extension
 of the Tournament Engine (TE) built on the Ingenious Framework\footnote{\url{https://bitbucket.org/skroon/ingenious-framework/src/master/}}
-(IF). The goal for the CTE was to allow people to play a turn-based game, provided
-it was supported in the IF, against each other in a match, where many matches
-made up a tournament. Multiple tournaments were then run to determine how good
-each player was. \\
+(IF). The goal for the CTE is to allow people to play a turn-based game, provided
+it is supported in the IF, against each other in a match, where many matches
+make up a tournament. Multiple tournaments can be run to determine how good
+each player is. \\
 
 It was found that there were some major limitations to the CTE, such as minimal
 error reporting, lack of error recovery and an unmaintainable code base to name
@@ -57,13 +57,29 @@ The FSCTE uses the following three main sections that are run in their own
 Docker containers:
 
 \begin{itemize}
-	\item \textbf{Web User Interface}: Allows a user to interact with the FSCTE.
-	\item \textbf{Database}: Used to store all the information relevant to the FSCTE.
+	\item \textbf{Web User Interface}: Allows a user to interact directly with
+	the FSCTE.
+	\item \textbf{Database}: Stores all the information relevant to the FSCTE.
 	\item \textbf{REST API}: Facilitates file upload to, and download from, the
 	web user interface.
 \end{itemize}
 
+The layout of the entire FSCTE system is further discussed in chapter
+\ref{chap:design}, \emph{design and implementation}.
+
+\section{Document Outline}
+
+This report will discuss the overview of the system in section \ref{chap:overview},
+the implementation and design of the system in section \ref{chap:design}, then
+onto the testing in section \ref{chap:testing} and discussion of the future of
+the project in section \ref{chap:future}. Finally, the conclusion will be
+presented in section \ref{chap:conclusion}.
+
 \chapter{System Overview}
+\label{chap:overview}
+
+This chapter will give an overview of the requirements for the FSCTE system and
+how the requirements have been met.
 
 \section{Ingenious Framework (IF)}
 
@@ -95,12 +111,16 @@ invalid, or the player times out, the match will be forfeit and the last player
 to send a valid move becomes the winner.
 
 \chapter{Design and Implementation}
+\label{chap:design}
 
 \chapter{Testing}
+\label{chap:testing}
 
 \chapter{Future Work}
+\label{chap:future}
 
 \chapter{Conclusion}
+\label{chap:conclusion}
 
 \printbibliography
 
