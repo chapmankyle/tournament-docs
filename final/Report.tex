@@ -1,8 +1,8 @@
 \documentclass[a4paper, 12pt]{report}
 
 \usepackage[style=numeric]{biblatex}
-\usepackage[margin=1.8cm]{geometry}
 \usepackage[utf8]{inputenc}
+\usepackage{geometry}
 \usepackage{graphicx}
 \usepackage{amsmath}
 \usepackage{hyperref}
@@ -16,10 +16,10 @@
 }
 \author{
 	{Kyle Chapman (20703236)} \\
-	{Supervisor: Dr. Cornelia P. Inggs} \\
-	{Cosupervisor: Mr. Andrew J. Collett}
+	{\emph{Supervisor: Dr. Cornelia P. Inggs}} \\
+	{\emph{Cosupervisor: Mr. Andrew J. Collett}}
 }
-\date{November 2020}
+\date{9 November 2020}
 
 \begin{document}
 
@@ -34,7 +34,14 @@ of the Tournament Engine (TE) built on the Ingenious Framework\footnote{\url{htt
 (IF). The goal for the CTE is to allow people to play a turn-based game, provided
 it is supported in the IF, against each other in a match, where many matches
 make up a tournament. Multiple tournaments can be run to determine how good
-each player is. \\
+each player is. Tournaments can separated into two categories: private and public. \\
+
+Private tournaments are tournaments that only the administrators can add players
+to, and they are mainly used to test some players against other players. Public
+tournaments are tournaments that any user can add their own players to and
+administrators can also add players to. These tournaments are used to put players
+against each other to rank each player based on how many wins they get against
+other players. \\
 
 It was found that there were some major limitations to the CTE, such as minimal
 error reporting, lack of error recovery and an unmaintainable code base to name
@@ -60,6 +67,9 @@ Docker containers:
 	\item \textbf{Web User Interface}: Allows a user to interact directly with
 	the FSCTE.
 	\item \textbf{Database}: Stores all the information relevant to the FSCTE.
+	\item \textbf{Database watcher (Golang)}: Watches the database for any changes,
+	such as tournaments being started, and sends messages to the front-end
+	accordingly.
 	\item \textbf{REST API}: Facilitates file upload to, and download from, the
 	web user interface.
 \end{itemize}
