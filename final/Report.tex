@@ -71,7 +71,8 @@ Docker containers:
 	such as tournaments being started, and sends messages to the front-end
 	accordingly.
 	\item \textbf{REST API}: Facilitates file upload to, and download from, the
-	web user interface.
+	web user interface, as well as CAS authentication for logging in with
+	Stellenbosch University credentials.
 \end{itemize}
 
 The layout of the entire FSCTE system is further discussed in chapter
@@ -79,26 +80,56 @@ The layout of the entire FSCTE system is further discussed in chapter
 
 \section{Document Outline}
 
-This report will discuss the overview of the system in section \ref{chap:overview},
-the implementation and design of the system in section \ref{chap:design}, then
-onto the testing in section \ref{chap:testing} and discussion of the future of
-the project in section \ref{chap:future}. Finally, the conclusion will be
-presented in section \ref{chap:conclusion}.
+This report will discuss the overview of the system in chapter \ref{chap:overview},
+the implementation and design of the system in chapter \ref{chap:design}, then
+onto the testing in chapter \ref{chap:testing} and discussion of the future of
+the project in chapter \ref{chap:future}. Finally, the conclusion will be
+presented in chapter \ref{chap:conclusion}.
 
-\chapter{System Overview}
+\chapter{Overview}
 \label{chap:overview}
 
 This chapter will give an overview of the requirements for the FSCTE system and
-how the requirements have been met.
-
-\section{Ingenious Framework (IF)}
+how the requirements have been met. \\
 
 The CTE used in $3^{\text{rd}}$ year at Stellenbosch
-University is \mbox{designed} to manage many Othello \cite{othello} tournaments,
+University is designed to manage many Othello \cite{othello} tournaments,
 involving many players, concurrently. A user is able to view public tournaments,
-players, referees, schedulers, etc. and view \mbox{relevant} statistics for
-ongoing and completed tournaments. The admin, usually the \mbox{lecturer}, is
-able to add tournaments, schedulers and rankers. \\
+players, referees, schedulers, etc. and view relevant statistics for
+ongoing and completed tournaments. The admin, usually the lecturer, is
+able to add tournaments, schedulers and rankers and the students are only allowed
+to upload their players and add them to public tournaments.
+
+\section{Docker}
+
+Each section of the FSCTE needs to be in their own separate environment, so that
+if some error occurs, it impacts only that specific section and not the entire
+FSCTE. Docker was chosen for this purpose, since it is relatively easy to spin
+up a section in its own environment and redeploy that section if some error
+occurs. \\
+
+The docker container is created by writing a \texttt{Dockerfile} that
+specifies which base environment you want to use (e.g. \texttt{ubuntu},
+\texttt{node}, \texttt{neo4j} etc.) and the command you want to run in the
+container. The container exits when the command finishes, so in order to keep
+the container running forever, infinite loops are useful. This means that the
+command will only finish when the user forcefully stops the container. \\
+
+Docker-compose\footnote{\url{https://docs.docker.com/compose/}} is used to spin
+up all of the docker containers used by the FSCTE,
+using their respective \texttt{Dockerfile}s, and allows for more control of how
+the container should be set up. Local directories can be mounted into the docker
+containers so that any files that are generated inside the container can be
+accessed outside of the container, on the host machine. This is useful for
+accessing the log files after a match has completed, so that it can be seen if
+the match was a success or not.
+
+\section{Web User Interface}
+
+The previous web user interface implemented in the CTE was not very user-friendly,
+which resulted in a lot of confusion for the students who used the CTE.
+
+\section{Ingenious Framework (IF)}
 
 A scheduler is used to schedule matches between two players in a round-robin
 \mbox{fashion}, where every player plays against every other player. After every player
@@ -129,8 +160,54 @@ to send a valid move becomes the winner.
 \chapter{Future Work}
 \label{chap:future}
 
+This chapter covers the future work that could be implemented in the Fail-Safe
+Cloud Tournament Engine (FSCTE) to extend the current functionality. The
+conclusion will be provided in section \ref{chap:conclusion}.
+
 \chapter{Conclusion}
 \label{chap:conclusion}
+
+The main requirements of the FSCTE that needed to be satisfied were:
+\begin{itemize}
+	\item have effective error handling
+	\item have effective debugging facilities
+	\item scale with tournaments and players
+	\item have a logical, clean and maintainable code base
+	\item have a more user-friendly web user interface
+\end{itemize}
+All of the above requirements were satisfied. The error handling requirement
+was satisfied by making sure that at any point where an error could occur, it
+was decided if the error was serious or not. If the error was serious, then an
+error message would be displayed and the component that caused the error would
+be stopped. If the error was not serious, then an error message would be displayed,
+but nothing would happen to the component that caused the error. \\
+
+The effective debugging facilities requirement was satisfied by logging all
+information that happens inside each docker container, so that if some error
+occurs, the user can look in the docker logs to see at which stage the error
+occurred. This allows the user to know exactly what was going on before the
+error occurred so that the user can pinpoint the issue and fix the problem. \\
+
+The tournaments and player scaling requirement was satisfied by writing the
+code base in such a way that it performs very well for any number of tournaments
+and players. Golang was mainly used to allow scaling to be possible through the
+use of concurrent threads running different tasks at the same time. \\
+
+The maintainable code base requirement was satisfied by providing extensive
+documentation throughout the code base, so that anyone who reads the code base
+can understand what is going on without any issue. \\
+
+The user-friendly web user interface requirement was satisfied by ensuring that
+the user can navigate to any page or get any information they want in a maximum
+of two mouse clicks. A lot of time was spent making sure that the web user
+interface looked clean and visually appealing, as well as easy to use. \\
+
+Working on the FSCTE for the past year has been a great challenge, but also a
+great reward. Initially, it was tough to understand what was going on in the CTE
+because of the lack of documentation and confusing way that some sections were
+implemented. After understanding the previous work, the toughest challenge was
+getting the players to play a match and communicate their results to the web
+user interface. However, it was a fun and informative experience.
 
 \printbibliography
 
