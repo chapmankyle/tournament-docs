@@ -100,7 +100,7 @@ ongoing and completed tournaments. The admin, usually the lecturer, is
 able to add tournaments, schedulers and rankers and the students are only allowed
 to upload their players and add them to public tournaments.
 
-\section{Docker}
+\section{Separate enviroments}
 
 Each section of the FSCTE needs to be in their own separate environment, so that
 if some error occurs, it impacts only that specific section and not the entire
@@ -129,7 +129,8 @@ the match was a success or not.
 The previous web user interface implemented in the CTE was not very user-friendly,
 which resulted in a lot of confusion for the students who used the CTE.
 
-\section{Ingenious Framework (IF)}
+\chapter{Design and Implementation}
+\label{chap:design}
 
 A scheduler is used to schedule matches between two players in a round-robin
 \mbox{fashion}, where every player plays against every other player. After every player
@@ -151,9 +152,6 @@ the move to the other player if the move made is valid. If the move made is
 invalid, or the player times out, the match will be forfeit and the last player
 to send a valid move becomes the winner.
 
-\chapter{Design and Implementation}
-\label{chap:design}
-
 \chapter{Testing}
 \label{chap:testing}
 
@@ -163,6 +161,20 @@ to send a valid move becomes the winner.
 This chapter covers the future work that could be implemented in the Fail-Safe
 Cloud Tournament Engine (FSCTE) to extend the current functionality. The
 conclusion will be provided in section \ref{chap:conclusion}.
+
+\section{Kubernetes}
+
+Kubernetes\footnote{\url{https://kubernetes.io/}} can be used to manage the docker
+containers, so that if a container crashes, another instance of that container
+can be redeployed without hesitation. Due to time constraints, it was not feasible
+to add Kubernetes to the current FSCTE.
+
+\section{Other Game Types}
+
+In the current FSCTE implementation, only the \texttt{Othello} game is supported.
+Supporting other game types will allow the FSCTE to be more abstract and versatile.
+Due to time constraints, it was not feasible to attempt to support other types
+of games.
 
 \chapter{Conclusion}
 \label{chap:conclusion}
