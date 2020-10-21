@@ -6,6 +6,7 @@
 \usepackage{graphicx}
 \usepackage{amsmath}
 \usepackage{hyperref}
+\usepackage{float}
 
 \addbibresource{References.bib}
 \graphicspath{ {images/} }
@@ -127,7 +128,59 @@ the match was a success or not.
 \section{Web User Interface}
 
 The previous web user interface implemented in the CTE was not very user-friendly,
-which resulted in a lot of confusion for the students who used the CTE.
+which resulted in a lot of confusion for the students who used the CTE. The entire
+web user interface in the FSCTE was written from scratch using new technologies,
+such as Vue\footnote{\url{https://vuejs.org/}} and
+TypeScript\footnote{\url{https://www.typescriptlang.org/}}, so that it was more
+visually appealing and easier for the lecturers and students to use. Students
+and lecturers (or admins) can log into the web user interface using Stellenbosch
+University Single-Sign On or by specifying their username and password if they
+already exist in the database. \\
+
+The students are able to upload their players to the web user interface and join
+public tournaments with their players. The students can have as many players as
+they would like, and each of the players are added to the tournament standings
+once they join a tournament. This allows the students to see how their players
+perform relative to other players in the same tournaments. \\
+
+The lecturers, or admins, are able to upload their own rankers, schedulers,
+referees and players to the web user interface. More will be explained about the
+rankers, schedulers and referees in chapter \ref{chap:design}. The admins can
+also add their own players to public or private tournaments, as well as they
+can add a student's player to a public or private tournament. The admins can
+start and stop tournaments, as well as create new tournaments. \\
+
+After a match has completed, either ending in a failure or success, the log files
+of that match can be accessed if the student or admin desires. This means that
+either the student or admin can see what moves both the players made and the
+final result of the match.
+
+\section{Software Stack}
+
+The FSCTE uses the following software stack:
+\begin{itemize}
+	\item \textbf{Vue} - Front-end framework that is used to interact with the
+	FSCTE.
+	\item \textbf{Typescript} - Superset of JavaScript that adds types, which
+	is useful for catching bugs before they make it into production.
+	\item \textbf{Python} - Used to create the REST API that facilitates
+	file upload to, and download from, the web user interface, as well as providing
+	authentication for logging in using Stellenbosch University Single-Sign On.
+	\item \textbf{Neo4j} - Database that is used to store all the information
+	necessary for the FSCTE to work. Highly relational database that uses the
+	Cypher\footnote{\url{https://neo4j.com/docs/cypher-manual/current/}} query
+	language to get or set attributes.
+	\item \textbf{Golang} - Used to schedule matches in tournaments concurrently,
+	with less overhead than using Java.
+	\item \textbf{Docker} - Tool to allow different components of the FSCTE to
+	operate in their own separate environments.
+	\item \textbf{Bash} - Used for writing scripts that will setup the FSCTE and
+	download any necessary programs.
+\end{itemize}
+The host system does not need to have docker pre-installed, since the FSCTE will
+check if docker and docker-compose are available in the setup script. If one or
+more programs are not installed, the script will download the necessary version
+onto the host machine.
 
 \chapter{Design and Implementation}
 \label{chap:design}
@@ -220,6 +273,21 @@ because of the lack of documentation and confusing way that some sections were
 implemented. After understanding the previous work, the toughest challenge was
 getting the players to play a match and communicate their results to the web
 user interface. However, it was a fun and informative experience.
+
+\chapter{Appendix}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.41]{login.png}
+	\caption{Login page}
+	\label{fig:login}
+\end{figure}
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.37]{dashboard-admin.png}
+	\caption{Dashboard after logging in as admin}
+	\label{fig:dashboard-admin}
+\end{figure}
 
 \printbibliography
 
