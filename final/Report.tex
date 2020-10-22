@@ -2,14 +2,24 @@
 
 \usepackage[style=numeric]{biblatex}
 \usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{etoolbox}
+\usepackage{float}
 \usepackage{geometry}
 \usepackage{graphicx}
-\usepackage{amsmath}
 \usepackage{hyperref}
-\usepackage{float}
 
 \addbibresource{References.bib}
 \graphicspath{ {images/} }
+
+\makeatletter
+
+\patchcmd{\@makechapterhead}{50\p@}{\chapheadtopskip}{}{}
+\patchcmd{\@makeschapterhead}{50\p@}{\chapheadtopskip}{}{}
+
+\makeatother
+
+\newlength{\chapheadtopskip}\setlength{\chapheadtopskip}{5mm}
 
 \title{
 	{Fail-Safe Cloud Tournament Engine with Error Detection and Error Recovery} \\
@@ -185,6 +195,53 @@ onto the host machine.
 \chapter{Design and Implementation}
 \label{chap:design}
 
+This chapter will describe the design and implementation of all the components
+present in the FSCTE. Figure \ref{fig:uml-structure} shows an overview of the
+components present in the FSCTE and how they interact.
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.25]{uml-structure.png}
+	\caption{UML diagram representing the structure of the FSCTE}
+	\label{fig:uml-structure}
+\end{figure}
+
+\section{Overview}
+
+This section serves as an explanation for what can be seen in the UML diagram in
+Figure \ref{fig:uml-structure}. \\
+
+The actor represents a user, who can be either an admin or student. This user
+only interacts with the web user interface to add players, tournaments and anything
+the user desires, provided they have the correct permissions. \\
+
+The rectangles with a blue outline represent docker containers and the rectangles
+with a dotted orange line represent entities inside the docker containers. The
+dotted grey line represents the docker container in which an entity resides.
+
+\section{Web User Interface}
+
+This section serves as an explanation for the purpose of the web user interface
+docker container seen in Figure \ref{fig:uml-structure}. \\
+
+\section{REST API}
+
+This section serves as an explanation for the purpose of the REST API docker
+container seen in Figure \ref{fig:uml-structure}. \\
+
+\section{Database}
+
+This section serves as an explanation for the purpose of the database docker
+container seen in Figure \ref{fig:uml-structure}. \\
+
+\section{Database Watcher}
+
+This section serves as an explanation for the purpose of the database watcher
+docker container seen in Figure \ref{fig:uml-structure}. \\
+
+\subsection{Match Server}
+
+\subsection{Match Client}
+
 A scheduler is used to schedule matches between two players in a round-robin
 \mbox{fashion}, where every player plays against every other player. After every player
 has played against every other player, the overall win-loss ratio can be calculated
@@ -276,6 +333,12 @@ user interface. However, it was a fun and informative experience.
 
 \chapter{Appendix}
 
+\section{Web User Interface}
+
+The images from Figure \ref{fig:login} to \ref{fig:about-admin} are screenshots
+from the web user interface that the admins and students will interact with.
+\vspace{0.4cm}
+
 \begin{figure}[H]
 	\centering
 	\includegraphics[scale=0.41]{login.png}
@@ -287,6 +350,24 @@ user interface. However, it was a fun and informative experience.
 	\includegraphics[scale=0.37]{dashboard-admin.png}
 	\caption{Dashboard after logging in as admin}
 	\label{fig:dashboard-admin}
+\end{figure}
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.37]{tournaments-admin.png}
+	\caption{Page describing the tournament `Placements'}
+	\label{fig:tourn-placements}
+\end{figure}
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.33]{settings-admin.png}
+	\caption{Settings popup for the tournament `Placements' when the logged in user is an admin}
+	\label{fig:settings-admin}
+\end{figure}
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.37]{about-admin.png}
+	\caption{About page}
+	\label{fig:about-admin}
 \end{figure}
 
 \printbibliography
