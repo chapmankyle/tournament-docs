@@ -223,6 +223,21 @@ dotted grey line represents the docker container in which an entity resides.
 This section serves as an explanation for the purpose of the web user interface
 docker container seen in Figure \ref{fig:uml-structure}. \\
 
+The web user interface is designed to be a Single-Page Application (SPA) that
+uses components to render specific ``pages'', instead of the traditional way of
+rendering complete HTML pages when the user navigates to a different URL route.
+This is accomplished by swapping out certain HTML elements with other elements
+so that the content of the page changes without having to re-render the elements
+that are present in both pages. As such, the performance of a SPA is significantly
+better than a traditional web app because of the reduced rendering needed to
+display different pages. Vue\footnote{\url{https://vuejs.org/}} was chosen as the
+framework to use because it is extremely easy to use and provides support for
+creating a SPA. An example of the login screen for the web user interface can be
+seen in Figure \ref{fig:login} in the Appendix. \\
+
+The web user interface consists of different tabs that a user can click to navigate
+to different views.
+
 \section{REST API}
 
 This section serves as an explanation for the purpose of the REST API docker
