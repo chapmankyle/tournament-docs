@@ -496,6 +496,25 @@ The following endpoints are available for access through the REST API:
 This section serves as an explanation for the purpose of the database docker
 container seen in Figure \ref{fig:uml-structure}. \\
 
+Neo4j\footnote{\url{https://neo4j.com/}} was chosen as the backend database
+because the main advantage is the fact that it is a graph database. Graph databases,
+such as Neo4j, differ from relational databases, such as SQL, in how they connect
+data. Neo4j uses nodes and relationships to connect data, whereas SQL uses
+primary and foreign keys. The data that the system uses benefits greatly from
+using relationships between nodes to describe the data, since, for example, a user
+can have many players (relationship is user to player) that participate in many
+tournaments (relationship is user to player to tournament). Such data would require
+multiple foreign keys and get very complicated very quickly. \\
+
+Neo4j uses the Cypher query language in order to write queries for the data in
+the database. The Cypher query language closely resembles English, making it easy
+to write complicated queries and return exactly the data that is needed. Database
+drivers were written in both TypeScript, for the web user interface, and Golang,
+for the database watcher. The database drivers allowed the web user interface
+and the database watcher to add, edit, delete and retrieve data from the
+database. An example of the graph database can be seen in Figure \ref{fig:database}
+in the Appendix.
+
 \section{Database Watcher}
 
 This section serves as an explanation for the purpose of the database watcher
@@ -508,11 +527,13 @@ docker container seen in Figure \ref{fig:uml-structure}. \\
 \section{Repository}
 
 The code is hosted on GitLab as a private repository and can be found at
-\url{https://git.cs.sun.ac.za/20703236/fscte}. All of the files present in the
-repository take up 36 Megabytes of space and consist of $11 652$ lines of code.
-Vue makes up 53.2\% of the code base, with Go making up 22\%, TypeScript making
-up 19.4\%, Shell making up 4.1\%, Python making up 0.9\% and the rest of the
-languages making up 0.4\% of the code base.
+\url{https://git.cs.sun.ac.za/20703236/fscte}. The instructions on how to start
+all of the docker containers is in the README, which is accessible at
+\url{https://git.cs.sun.ac.za/20703236/fscte/-/blob/master/README.md}. All of
+the files present in the repository take up 36 Megabytes of space and consist
+of $11 652$ lines of code. Vue makes up 53.2\% of the code base, with Go making
+up 22\%, TypeScript making up 19.4\%, Shell making up 4.1\%, Python making up
+0.9\% and the rest of the languages making up 0.4\% of the code base.
 
 \chapter{Testing}
 \label{chap:testing}
@@ -638,6 +659,12 @@ from the web user interface that the admins and students will interact with.
 	\includegraphics[scale=0.37]{players-student.png}
 	\caption{`Players' tab when logged in as a student}
 	\label{fig:players-student}
+\end{figure}
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.46]{graph-ex.png}
+	\caption{An example of the data connected in the Neo4j database}
+	\label{fig:database}
 \end{figure}
 \begin{figure}[H]
 	\centering
