@@ -78,7 +78,7 @@ Docker containers:
 	\item \textbf{Web User Interface}: Allows a user to interact directly with
 	the FSCTE.
 	\item \textbf{Database}: Stores all the information relevant to the FSCTE.
-	\item \textbf{Database watcher (Golang)}: Watches the database for any changes,
+	\item \textbf{Database Watcher (Golang)}: Watches the database for any changes,
 	such as tournaments being started, and sends messages to the front-end
 	accordingly.
 	\item \textbf{REST API}: Facilitates file upload to, and download from, the
@@ -155,10 +155,10 @@ perform relative to other players in the same tournaments. \\
 
 The lecturers, or admins, are able to upload their own rankers, schedulers,
 referees and players to the web user interface. More will be explained about the
-rankers, schedulers and referees in chapter \ref{chap:design}. The admins can
-also add their own players to public or private tournaments, as well as they
-can add a student's player to a public or private tournament. The admins can
-start and stop tournaments, as well as create new tournaments. \\
+rankers, schedulers and referees in chapter \ref{sec:impl-web-interface}. The
+admins can also add their own players to public or private tournaments, as well
+as they can add a student's player to a public or private tournament. The admins
+can start and stop tournaments, as well as create new tournaments. \\
 
 After a match has completed, either ending in a failure or success, the log files
 of that match can be accessed if the student or admin desires. This means that
@@ -206,6 +206,7 @@ components present in the FSCTE and how they interact.
 \end{figure}
 
 \section{Overview}
+\label{sec:impl-overview}
 
 This section serves as an explanation for what can be seen in the UML diagram in
 Figure \ref{fig:uml-structure}. \\
@@ -219,6 +220,7 @@ with a dotted orange line represent entities inside the docker containers. The
 dotted grey line represents the docker container in which an entity resides.
 
 \section{Web User Interface}
+\label{sec:impl-web-interface}
 
 This section serves as an explanation for the purpose of the web user interface
 docker container seen in Figure \ref{fig:uml-structure}. \\
@@ -235,8 +237,61 @@ framework to use because it is extremely easy to use and provides support for
 creating a SPA. An example of the login screen for the web user interface can be
 seen in Figure \ref{fig:login} in the Appendix. \\
 
+The web user interface makes use of cookies to store the session, so that the
+user stays logged in even when closing the web user interface browser tab. The
+cookies are saved for seven days, meaning that once the cookies expire, the
+user has to log in again. Since Vue was chosen as the front-end framework, the
+library \texttt{VueCookies}\footnote{\url{https://www.npmjs.com/package/vue-cookies}}
+was chosen as the way to store cookies in the web user interface. This library
+was easy to use and provided many customizable options, as well as it is
+regularly updated. \\
+
 The web user interface consists of different tabs that a user can click to navigate
-to different views.
+to different views. The tabs that can be accessed vary depending on the level of
+permission of the logged in user, i.e. admins will be able to access more tabs
+than students will be able to. However, some tabs are accessible regardless of
+if a user is logged in or not. These tabs are the `Tournaments' tab, `Matches'
+tab, `Standings' tab and finally the `About' tab. If user logs in as a student,
+the user is able to access the `Players' tab as well as all of the tabs
+accessible when not logged in. If the user logs in as an admin, the user is able
+to access the `Components' tab as well as all of the tabs accessible to a student.
+The above tabs will be explained in further detail from section
+\ref{sec:impl-tab-tournaments} to \ref{sec:impl-tab-about}.
+
+\subsection{`Tournaments' tab}
+\label{sec:impl-tab-tournaments}
+
+The `Tournaments' tab is accessible by a user who is not logged in, a student
+and an admin. A screenshot of the page after clicking the tab can be seen in
+Figure \ref{fig:all-tourn-student} in the Appendix, when logged in as a student,
+and Figure \ref{fig:all-tourn-admin} in the Appendix, when logged in as an
+admin.
+
+\subsubsection*{User Not Logged In}
+
+The user is able to view all of the public and private tournaments that are
+taking place. An overview of the tournaments is provided where the name of the
+tournament, the current status of the tournament (either ``Not Started'',
+``Running'' or ``Finished''), the maximum time limit for each move (in milliseconds)
+and the number of players currently in the tournament are displayed in a table.
+There is a difference between a user and a player, where the user is the person
+who is currently logged in (student or admin) and the player is an executable
+that the user uploads to take part in tournaments. A user can have many players.
+
+\subsection{`Matches' tab}
+\label{sec:impl-tab-matches}
+
+\subsection{`Players' tab}
+\label{sec:impl-tab-players}
+
+\subsection{`Standings' tab}
+\label{sec:impl-tab-standings}
+
+\subsection{`Components' tab}
+\label{sec:impl-tab-components}
+
+\subsection{`About' tab}
+\label{sec:impl-tab-about}
 
 \section{REST API}
 
@@ -365,6 +420,18 @@ from the web user interface that the admins and students will interact with.
 	\includegraphics[scale=0.37]{dashboard-admin.png}
 	\caption{Dashboard after logging in as admin}
 	\label{fig:dashboard-admin}
+\end{figure}
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.33]{all-tournaments-student.png}
+	\caption{`Tournaments' tab when logged in as a student}
+	\label{fig:all-tourn-student}
+\end{figure}
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.33]{all-tournaments-admin.png}
+	\caption{`Tournaments' tab when logged in as an admin}
+	\label{fig:all-tourn-admin}
 \end{figure}
 \begin{figure}[H]
 	\centering
