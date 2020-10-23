@@ -155,7 +155,7 @@ perform relative to other players in the same tournaments. \\
 
 The lecturers, or admins, are able to upload their own rankers, schedulers,
 referees and players to the web user interface. More will be explained about the
-rankers, schedulers and referees in chapter \ref{sec:impl-web-interface}. The
+rankers, schedulers and referees in chapter \ref{sec:impl-tab-components}. The
 admins can also add their own players to public or private tournaments, as well
 as they can add a student's player to a public or private tournament. The admins
 can start and stop tournaments, as well as create new tournaments. \\
@@ -213,7 +213,11 @@ Figure \ref{fig:uml-structure}. \\
 
 The actor represents a user, who can be either an admin or student. This user
 only interacts with the web user interface to add players, tournaments and anything
-the user desires, provided they have the correct permissions. \\
+the user desires, provided they have the correct permissions. There is a
+difference between a user and a player, where the user is the person who is
+currently logged in (student or admin) and the player is an executable that the
+user uploads to take part in tournaments. As such, a single user can have many
+players. \\
 
 The rectangles with a blue outline represent docker containers and the rectangles
 with a dotted orange line represent entities inside the docker containers. The
@@ -274,12 +278,67 @@ taking place. An overview of the tournaments is provided where the name of the
 tournament, the current status of the tournament (either ``Not Started'',
 ``Running'' or ``Finished''), the maximum time limit for each move (in milliseconds)
 and the number of players currently in the tournament are displayed in a table.
-There is a difference between a user and a player, where the user is the person
-who is currently logged in (student or admin) and the player is an executable
-that the user uploads to take part in tournaments. A user can have many players.
+The table uses a live-updating system, meaning that the user does not need to
+refresh the page to see any updates to the tournaments, instead the updates are
+shown immediately as they happen. \\
+
+The user can click on any entry in the tournaments table to be redirected to
+the specific tournament information of the selected tournament. On this page, the
+user can see the type of the tournament (either public or private), the status
+of the tournament, the maximum time limit per move, the referee used, the scheduler
+used and the ranker used. The user can also see the player names of the current
+players in the tournament. The referee, scheduler and ranker will be explained
+in detail in section \ref{sec:impl-tab-components}. \\
+
+A table showing the current players participating the selected tournament is
+present at the bottom of the selected tournament information page. The user can
+see the player names, not the names of the users, of all the players participating
+in the selected tournament.
+
+\subsubsection*{User Logged In As A Student}
+
+The user is able to see and do everything described above, as well as being able
+to add their own player to a specific public tournament. If the current user has not
+uploaded any players, they can select a specific tournament from the table and
+they can add a player from within the tournament information page. This will create
+a player, link the player to the user and put the player into the selected
+tournament. If the user already has uploaded a player, or many players, they will
+be presented with a dropdown list of their own players, and the user is then able
+to select which player they would like to add to the tournament. \\
+
+If the user has a player participating in the selected tournament, the user can
+see the name of their player and remove their player from that tournament if
+they wish to do so.
+
+\subsubsection*{User Logged In As An Admin}
+
+The user is able to see and do everything described above, as well as being able
+to create a tournament and add students' players to both private and public
+tournaments. When creating a new tournament, the user must specify the name of
+the tournament, the type (either public or private) and the maximum time per move
+(in milliseconds). A check is performed on the name of the tournament, which makes
+sure the name is unique. If the name is not unique, the new tournament is rejected
+and the user must enter a unique tournament name. \\
+
+If the user selects a specific tournament from the table, the user can add a player
+of their own or add a player from a student to the tournament. Only an admin can
+add players to a private tournament, but students are able to add their players
+to public tournaments. The user can start and stop the tournament as they wish,
+as well as edit the information of a specific tournament. When editing the
+tournament information, the user can change the name of the tournament, the type
+of the tournament, the maximum time limit per move, the referee, the scheduler
+and the ranker. A screenshot of the popup displayed when editing a specific
+tournament can be seen in Figure \ref{fig:settings-admin}. The user can also
+remove any student player from the tournament, as well as being able to delete
+the entire tournament if the user wishes.
 
 \subsection{`Matches' tab}
 \label{sec:impl-tab-matches}
+
+The `Matches' tab is accessible by a user who is not logged in, a student
+and an admin. A screenshot of the page after clicking the tab can be seen in
+Figure \ref{fig:matches-student} in the Appendix, when logged in as a student,
+and the page is the same for when logged in as an admin or when not logged in.
 
 \subsection{`Players' tab}
 \label{sec:impl-tab-players}
@@ -289,6 +348,26 @@ that the user uploads to take part in tournaments. A user can have many players.
 
 \subsection{`Components' tab}
 \label{sec:impl-tab-components}
+
+A scheduler is used to schedule matches between two players in a round-robin
+\mbox{fashion}, where every player plays against every other player. After every player
+has played against every other player, the overall win-loss ratio can be calculated
+that can be used to \mbox{distinguish} between good, average and bad players. The
+win-loss ratio and the Elo rating \cite{elo} can be used in conjunction. \\
+
+A ranker is used to distinguish between the good and bad players by comparing
+the Elo of the two players, where every player starts on the same amount of Elo.
+For every win that a player has, they gain a certain amount of Elo and for every
+loss that a player has, they lost a certain amount of Elo. The amount gained or
+lost decreases for every match that the player plays, meaning that eventually
+the Elo rating will be a true reflection of the skill level of the player. \\
+
+A referee is used to monitor the moves that the two players make in a match and
+check if any player makes an invalid move or times out. One player sends a
+move to the referee, which then checks if the move is valid and only sends
+the move to the other player if the move made is valid. If the move made is
+invalid, or the player times out, the match will be forfeit and the last player
+to send a valid move becomes the winner.
 
 \subsection{`About' tab}
 \label{sec:impl-tab-about}
@@ -311,26 +390,6 @@ docker container seen in Figure \ref{fig:uml-structure}. \\
 \subsection{Match Server}
 
 \subsection{Match Client}
-
-A scheduler is used to schedule matches between two players in a round-robin
-\mbox{fashion}, where every player plays against every other player. After every player
-has played against every other player, the overall win-loss ratio can be calculated
-that can be used to \mbox{distinguish} between good, average and bad players. The
-win-loss ratio and the Elo rating \cite{elo} can be used in conjunction. \\
-
-A ranker is used to distinguish between the good and bad players by comparing
-the Elo of the two players, where every player starts on the same amount of Elo.
-For every win that a player has, they gain a certain amount of Elo and for every
-loss that a player has, they lost a certain amount of Elo. The amount gained or
-lost decreases for every match that the player plays, meaning that eventually
-the Elo rating will be a true reflection of the skill level of the player. \\
-
-A referee is used to monitor the moves that the two players make in a match and
-check if any player makes an invalid move or times out. One player sends a
-move to the referee, which then checks if the move is valid and only sends
-the move to the other player if the move made is valid. If the move made is
-invalid, or the player times out, the match will be forfeit and the last player
-to send a valid move becomes the winner.
 
 \chapter{Testing}
 \label{chap:testing}
@@ -444,6 +503,12 @@ from the web user interface that the admins and students will interact with.
 	\includegraphics[scale=0.33]{settings-admin.png}
 	\caption{Settings popup for the tournament `Placements' when the logged in user is an admin}
 	\label{fig:settings-admin}
+\end{figure}
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.38]{matches-student.png}
+	\caption{`Matches' tab when logged in as a student}
+	\label{fig:matches-student}
 \end{figure}
 \begin{figure}[H]
 	\centering
