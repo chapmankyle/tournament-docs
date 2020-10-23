@@ -287,8 +287,8 @@ the specific tournament information of the selected tournament. On this page, th
 user can see the type of the tournament (either public or private), the status
 of the tournament, the maximum time limit per move, the referee used, the scheduler
 used and the ranker used. The user can also see the player names of the current
-players in the tournament. The referee, scheduler and ranker will be explained
-in detail in section \ref{sec:impl-tab-components}. \\
+players in the tournament. The ranker, scheduler and referee will be explained
+in detail from section \ref{sec:ranker} to \ref{sec:referee}. \\
 
 A table showing the current players participating the selected tournament is
 present at the bottom of the selected tournament information page. The user can
@@ -369,26 +369,6 @@ and the page is the same for when logged in as an admin or when not logged in.
 
 \subsection{`Components' tab}
 \label{sec:impl-tab-components}
-
-A scheduler is used to schedule matches between two players in a round-robin
-\mbox{fashion}, where every player plays against every other player. After every player
-has played against every other player, the overall win-loss ratio can be calculated
-that can be used to \mbox{distinguish} between good, average and bad players. The
-win-loss ratio and the Elo rating \cite{elo} can be used in conjunction. \\
-
-A ranker is used to distinguish between the good and bad players by comparing
-the Elo of the two players, where every player starts on the same amount of Elo.
-For every win that a player has, they gain a certain amount of Elo and for every
-loss that a player has, they lost a certain amount of Elo. The amount gained or
-lost decreases for every match that the player plays, meaning that eventually
-the Elo rating will be a true reflection of the skill level of the player. \\
-
-A referee is used to monitor the moves that the two players make in a match and
-check if any player makes an invalid move or times out. One player sends a
-move to the referee, which then checks if the move is valid and only sends
-the move to the other player if the move made is valid. If the move made is
-invalid, or the player times out, the match will be forfeit and the last player
-to send a valid move becomes the winner.
 
 \subsection{`About' tab}
 \label{sec:impl-tab-about}
@@ -520,9 +500,107 @@ in the Appendix.
 This section serves as an explanation for the purpose of the database watcher
 docker container seen in Figure \ref{fig:uml-structure}. \\
 
+The database watcher was written in Golang because it is a language that handles
+concurrency very well, since the first version was released recently, March 2012
+\cite{golang}, and has concurrency at its core. Golang is being updated frequently,
+with the newest version being released in August 2020. Golang also has multiple
+advantages over Java, such as:
+\begin{itemize}
+	\item Low overhead, since Golang does not use the Java Virtual Machine.
+	\item Concurrency is built into the core language and simple to use compared
+	to Java threads.
+	\item Faster performance when compared to Java.
+\end{itemize}
+The above advantages are the reason that Golang was chosen over Java for writing
+the database watcher. \\
+
+The main role of the database watcher is to watch for any database changes at a
+set interval. The main change that the database watcher is looking for is when a
+tournament is started or stopped. When this change occurs, the database watcher
+retrieves the name of the tournament and retrieves the ranker, scheduler, referee
+and players that are participating in that tournament. Information about the
+ranker, scheduler and referee is given from section \ref{sec:ranker} to
+\ref{sec:referee}.
+
+\subsection{Ranker}
+\label{sec:ranker}
+
+The ranker is used to distinguish between the good and bad players by comparing
+the rating of the two players, where every player starts on the same rating.
+For every win that a player has, their rating increases by some amount and
+for every loss that a player has, their rating decreases by some amount. The
+amount gained or lost decreases for every match that the player plays, meaning
+that eventually the rating will be a true reflection of the skill level of the
+player. \\
+
+The ranker needs to be written in Golang so that it can integrate into the database
+watcher and the specification for writing the ranker can be found at
+\url{https://git.cs.sun.ac.za/20703236/fscte-docs/-/blob/master/guidelines/Ranker.md}.
+An example of a ranker that uses the Elo \cite{elo} rating system can be found in
+the \texttt{mock-data} directory in the root of the FSCTE repository and it is
+called \texttt{EloRanker.go}.
+
+\subsection{Scheduler}
+\label{sec:scheduler}
+
+The scheduler is used to schedule matches between two players that play against
+each other in order to see who is the better player. After every player
+has played against every other player in the tournament, the overall win-loss
+ratio for that tournament can be calculated, which can then be used to
+distinguish between good, average and bad players. The win-loss ratio and the
+rating system can be used in conjunction to organize fair matches between players
+are of a similar skill level. \\
+
+The scheduler needs to be written in Golang so that it can integrate into the
+database watcher and the specification for writing the scheduler can be found at
+\url{https://git.cs.sun.ac.za/20703236/fscte-docs/-/blob/master/guidelines/Scheduler.md}
+An example of a scheduler that uses a round-robin strategy to organize matches
+between players can be found in the \texttt{mock-data} directory in the root of
+the FSCTE repository and it is called \texttt{RoundRobin.go}.
+
+\subsection{Referee}
+\label{sec:referee}
+
+The referee is used to monitor the moves that the two players make in a match and
+check if any player makes an invalid move or times out. One player sends a
+move to the referee, which then checks if the move is valid and only sends
+the move to the other player if the move made is valid. If the move made is
+invalid, or the player times out, the match will be forfeit and the last player
+to send a valid move becomes the winner. \\
+
+The referee needs to be a \texttt{JAR} file that is compatible with a game type
+supported by the Ingenious
+Framework\footnote{\url{https://bitbucket.org/skroon/ingenious-framework/src/master/IngeniousFrame/src/main/java/za/ac/sun/cs/ingenious/games/}}.
+An example of a referee for the Othello game is provided in the \texttt{mock-data}
+directory in the root of the FSCTE repository and it is called \texttt{OthelloReferee.jar}.
+
 \subsection{Match Server}
 
+The match server docker container is started when a new tournament is started,
+which starts the Java server using the referee that the tournament uses. The match
+server lasts for only a single match and the log file from the perspective of the
+referee is stored on the FSCTE local system. A path to the match log file is stored
+in the database so that the referee log file can be downloaded from the web user
+interface at a later stage.
+
 \subsection{Match Client}
+
+The match client docker container is started after the match server docker container
+is started, and is used to create the lobby for two of the players in the tournament
+as well as play out the match between the players. The way the two players are
+selected is defined by the scheduler that is used for the tournament and the
+rating update after the match has concluded is defined by the ranker used in the
+tournament. \\
+
+The match lobby is created in the match client docker container and then the
+players are copied from the FSCTE local system into the match client docker
+container. The players are then connected to the match server and play against
+each other by sending their moves to the referee, which verifies if the moves are
+valid and if they are valid, then the referee sends the move to the other player.
+This process continues until either a player sends an invalid move or the game
+is played out until completion. The log files of each player are stored and the
+path to the log files are added to the database so that each player log file can
+be downloaded at a later stage using the web user interface.
 
 \section{Repository}
 
@@ -662,15 +740,18 @@ from the web user interface that the admins and students will interact with.
 \end{figure}
 \begin{figure}[H]
 	\centering
-	\includegraphics[scale=0.46]{graph-ex.png}
-	\caption{An example of the data connected in the Neo4j database}
-	\label{fig:database}
-\end{figure}
-\begin{figure}[H]
-	\centering
 	\includegraphics[scale=0.37]{about-admin.png}
 	\caption{About page}
 	\label{fig:about-admin}
+\end{figure}
+
+\section{Database}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.55]{graph-ex.png}
+	\caption{An example of the data connected in the Neo4j database}
+	\label{fig:database}
 \end{figure}
 
 \printbibliography
