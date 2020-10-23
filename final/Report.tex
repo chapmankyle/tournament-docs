@@ -398,10 +398,10 @@ to send a valid move becomes the winner.
 This section serves as an explanation for the purpose of the REST API docker
 container seen in Figure \ref{fig:uml-structure}. \\
 
-The REST API is written in Python 3.7 because it is very easy to set up. It runs
-in its own docker container and is available on port 5000. The API allows for
-file upload to and download from the web user interface, as well as providing
-access points for CAS authentication. \\
+The REST API is written in Python 3.7 and Flask\footnote{\url{https://flask.palletsprojects.com/en/1.1.x/}}
+because it is very easy to set up. It runs in its own docker container and is
+available on port 5000. The API allows for file upload to and download from the
+web user interface, as well as providing access points for CAS authentication. \\
 
 File uploading is used for when a user uploads their player using the web user
 interface. The file is selected from the user's operating system and uploaded
