@@ -339,39 +339,83 @@ The `Matches' tab is accessible by a user who is not logged in, a student
 and an admin. A screenshot of the page after clicking the tab can be seen in
 Figure \ref{fig:matches-student} in the Appendix, when logged in as a student,
 and the page is the same for when logged in as an admin or when not logged in.
+There is no difference in functionality for matches when not logged in,
+logged in as a student or logged in as an admin, because the matches are
+automatically generated when a tournament is started. \\
 
-\subsubsection*{User Not Logged In}
-
-\subsubsection*{User Logged In As A Student}
-
-\subsubsection*{User Logged In As An Admin}
+The matches are grouped by their type, meaning that all of the matches played in
+a public tournament will be under the `Public' heading and all of the matches
+played in a private tournament will be under the `Private' heading. Under each
+heading, the matches are organized based on the name of the tournament in which
+the matches were played. The matches are displayed in a table, which shows the
+ID of the match, the players that participated in the match, the status of the
+match and the winner of that match. When clicking on a specific match ID, the user
+is redirected to a page that displayed the status of the match, the winner and a
+message extracted from the log files. The message gives extra information about
+whether an error occurred or, if the match finished successfully, the message will
+display the new rating of the two players. There are also buttons at the bottom
+of the match information page that allow the user to download each players log
+files, as well as the referee log files.
 
 \subsection{`Players' tab}
 \label{sec:impl-tab-players}
 
 The `Players' tab is only accessible by a user who is a student or an admin. A
-screenshot of the page after clicking the tab can be seen in
-Figure \ref{fig:matches-student} in the Appendix, when logged in as a student,
-and the page is the same for when logged in as an admin or when not logged in.
+screenshot of the page after clicking the tab can be seen in Figure
+\ref{fig:matches-student} in the Appendix, when logged in as a student, and the
+page is the same for when logged in as an admin or when not logged in. There is
+no difference in functionality for when a user is logged in as a student or an
+admin. \\
 
-\subsubsection*{User Logged In As A Student}
-
-\subsubsection*{User Logged In As An Admin}
+The players that the logged in user has uploaded is displayed in a table, where
+the name of the players are displayed. There is also a button that allows the
+user to delete any player they have uploaded, which also removes the player from
+any tournaments that it is taking part in. If the user has uploaded players, an
+additional section is displayed that shows in which tournaments each player is
+participating in. From this additional section, the user can add their player
+to another tournament or view the information for the tournaments that the player
+already has participated in. A screenshot of the `Players' page can be seen in
+Figure \ref{fig:players-student} in the Appendix.
 
 \subsection{`Standings' tab}
 \label{sec:impl-tab-standings}
 
-\subsubsection*{User Not Logged In}
+The `Standings' tab is accessible by a user who is not logged in, a student
+and an admin. A screenshot of the page after clicking the tab can be seen in
+Figure \ref{fig:standings-admin} in the Appendix, when logged in as an admin,
+and the page is the same for when logged in as a student or when not logged in.
+There is no difference in functionality for the standings when not logged in,
+logged in as a student or logged in as an admin, because the standings are
+automatically generated when the matches finish. \\
 
-\subsubsection*{User Logged In As A Student}
-
-\subsubsection*{User Logged In As An Admin}
+The standings are grouped by their type, meaning that all of the standings in a
+public tournament will be under the `Public' heading and all of the standings in
+a private tournament will be under the `Private' heading. Under each heading, the
+standings are organized based on the name of the tournament. The standings are
+displayed in a table, which shows the position of each player relative to the
+other players, the name of the players, the number of wins, losses and draws, as
+well as the win-loss ratio and the rating for each player.
 
 \subsection{`Components' tab}
 \label{sec:impl-tab-components}
 
+The `Components' tab is only accessible by a user who is an admin. A screenshot
+of the page after clicking the tab can be seen in Figure \ref{fig:components-admin}
+in the Appendix. \\
+
 \subsection{`About' tab}
 \label{sec:impl-tab-about}
+
+The `About' tab is accessible by a user who is not logged in, a student
+and an admin. A screenshot of the page after clicking the tab can be seen in
+Figure \ref{fig:about-admin} in the Appendix, when logged in as an admin,
+and the page is the same for when logged in as a student or when not logged in.
+There is no difference in functionality for the about page when not logged in,
+logged in as a student or logged in as an admin, because it is a static page
+that doesn't rely on any generated information. \\
+
+The about page describes the types of tournaments that the user can see and
+gives an overview of what the ranker, referee and scheduler mean.
 
 \section{REST API}
 
@@ -737,6 +781,18 @@ from the web user interface that the admins and students will interact with.
 	\includegraphics[scale=0.37]{players-student.png}
 	\caption{`Players' tab when logged in as a student}
 	\label{fig:players-student}
+\end{figure}
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.33]{standings-admin.png}
+	\caption{`Standings' tab when logged in as an admin}
+	\label{fig:standings-admin}
+\end{figure}
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.35]{components-admin.png}
+	\caption{`Components' tab when logged in as an admin}
+	\label{fig:components-admin}
 \end{figure}
 \begin{figure}[H]
 	\centering
