@@ -627,7 +627,7 @@ to send a valid move becomes the winner. \\
 
 The referee needs to be a \texttt{JAR} file that is compatible with a game type
 supported by the Ingenious
-Framework\footnote{\url{https://bitbucket.org/skroon/ingenious-framework/src/master/IngeniousFrame/src/main/java/za/ac/sun/cs/ingenious/games/}}.
+Framework\footnote{\url{https://bitbucket.org/skroon/ingenious-framework/src/master/}}.
 An example of a referee for the Othello game is provided in the \texttt{mock-data}
 directory in the root of the FSCTE repository and it is called \texttt{OthelloReferee.jar}.
 
@@ -674,9 +674,121 @@ base.
 \chapter{Testing}
 \label{chap:testing}
 
+This chapter covers the testing that has been done on the FSCTE to ensure that
+every unit of the system works as intended, and also allows future developers to
+see if any change they make breaks existing functionality or not. The individual
+units of the system need to be tested, but the integration between the units and
+the system as a whole also needs to be tested. The unit testing will be discussed
+in section \ref{sec:unit-test} and the integration testing will be discussed in
+section \ref{sec:integ-test}.
+
 \section{Unit Testing}
+\label{sec:unit-test}
+
+This section describes the unit testing that is performed on each component of
+the FSCTE system.
+
+\subsection{Web User Interface}
+
+The web user interface was tested manually by going through the entire web user
+interface. The login was tested using the following methods:
+\begin{itemize}
+	\item \textbf{Admin username with wrong password}: The web user interface
+	rejected the login attempt and displayed a popup message saying ``Incorrect
+	username and password combination.'' This is the expected result.
+	\item \textbf{Admin username with correct password}: The web user interface
+	accepted the login attempt and redirects to the \texttt{/dashboard} page.
+	This is the expected result.
+	\item \textbf{Student login using incorrect SU credentials}: The web user
+	interface redirects to the Stellenbosch University Single-Sign On page,
+	where the incorrect credentials are inputted. The Single-Sign On page rejects
+	the login attempt and displays a message stating: ``Sign-on failed. Username
+	or password is incorrect.'' This is the expected result.
+	\item \textbf{Student login using correct SU credentials}: The web user
+	interface redirects to the Stellenbosch University Single-Sign On page,
+	where the correct credentials are inputted. The Single-Sign On page accepts
+	the login attempt and redirects to the \texttt{/dashboard} page. This is the
+	expected result.
+\end{itemize}
+The tournaments page was tested by adding a tournament manually into the database
+and checking if the tournament was updated in the table of tournaments. For all
+the various tournaments that were manually added, the tournaments appeared
+immediately in the table of tournament present. \\
+
+The matches page was tested by starting various tournaments at the same time,
+which started the match scheduling in the database watcher. After each match
+had completed, the status in the web user interface was updated, as expected,
+with the result of the match. When an error occurred, causing the match to
+fail, the winner was reported to be ``Invalid'', which was expected. A detailed
+log of what caused the match to fail was accessible by clicking on the match
+in the matches table. When the match completed successfully, with no players
+failing or running out of time, the winner was reported. The winner was verified
+by looking at the referee log file, and of all the matches that completed
+successfully, the winner was reported correctly. Downloading the log files was
+tested by clicking on the specific log files and checking the contents of the
+file, to make sure that the match file downloaded was indeed the correct match
+file. In all cases, the correct match log files were downloaded. \\
+
+The players page was tested by adding a player and checking if the table displaying
+the players updated with the correct player name. The added players were also tested
+by adding them to a tournament and then starting the tournament, thus creating
+matches in which the players would play each other. The players were successfully
+added to all the tournaments and successfully played all the matches, resulting
+in one of the players being the best with an almost flawless win-loss ratio.
+This was deemed to be working as intended, since after playing multiple matches
+against various opponents, there will always be at least one player that is the
+best. \\
+
+The standings page was tested by starting tournaments and waiting for all of
+the matches to finish. Once the matches have finished, the results of the matches
+were checked. Whenever a player wins against another player, their rating should
+increase and if they lose against another player, their rating should decrease.
+If the match results end in a draw, neither player's rating increases or decreases.
+This result was checked against the standings table, to see if the standings
+updated after a match was played. It was found that the standings were automatically
+updated as soon as the match concluded, and the winner was the same as the winner
+found in the log file. \\
+
+The components page was tested by adding and removing components and checking if
+they were updated in the components table. Only the admin user is able to test
+the components, since the admin is the only user that has access to the components
+page. It was seen that adding and removing components from the database added
+and removed the components from the web user interface as well, which is the
+expected result. \\
+
+There was no need to test the about page, since it is a static page that does
+not have any generated data.
+
+\subsection{Database}
+
+The database was tested using Python and the Neo4j pip package. Various methods
+were tested to see if, after adding or deleting nodes from the database, the
+backend database would change. After multiple tournaments were added and removed,
+as well as adding players and removing players, the database did indeed change
+and the actions were reflected. \\
+
+The database was also tested using the Golang test suite, which is built into
+the core language. Some small errors were discovered when testing using the
+Golang test suite, which have now since been fixed and all test cases pass.
 
 \section{Integration Testing}
+\label{sec:integ-test}
+
+This section describes the integration testing performed on the FSCTE system.
+
+\subsection{Tournaments running concurrently}
+
+It is a requirements that the tournaments are able to be run concurrently, so
+that no tournament needs to wait for another tournament to finish before another
+can start. Golang was useful here because of the built-in concurrency it brings
+and the concurrent tournaments were tested by starting multiple tournaments at
+the same time. It was seen that the matches were scheduled independently of one
+another and all of the matches in each scheduled tournament finished. \\
+
+The match results were checked by downloading the log files and checking that the
+result obtained from the log file is the same as the reported result by the match
+table. For all the matches that were played, the log files and match table results
+were the exact same, hence the concurrent tournaments worked as expected.
 
 \chapter{Future Work}
 \label{chap:future}
