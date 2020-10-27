@@ -48,8 +48,8 @@ make up a tournament. Multiple tournaments can be run to determine how good
 each player is relative to the other players in the tournaments. \\
 
 The third year Computer Science course, Concurrency (RW 314), used the CTE to
-allow the students to write players for the Othello game, and pit the players
-that the students wrote against other players in the class. The students would
+allow the students to submit players for the Othello game, and allow the players
+to \mbox{compete} in matches against other players. The students would
 access the CTE web interface and upload their players, then put their players
 into public tournaments. The lecturer, or any admin, could then start the
 tournament and matches would be played between all players that are participating
@@ -68,11 +68,11 @@ system stability as possible.
 \section{Scope}
 
 The system used to manage the FSCTE is made up of multiple Docker\footnote{\url{https://docs.docker.com/engine/docker-overview/}}
-containers, which run each section of the FSCTE in their own separate environment.
-If some error occurs in a section of the system, it will not affect the other
-sections, since they are in separate environments. \\
+containers, which run each component of the FSCTE in their own separate environment.
+If an error occurs in a component of the system, it will not affect the other
+components, since they are in separate environments. \\
 
-The FSCTE uses the following three main sections that are run in their own
+The FSCTE uses the following three main components that are run in their own
 Docker containers:
 
 \begin{itemize}
@@ -114,10 +114,10 @@ to upload their players and add them to public tournaments.
 
 \section{Separate enviroments}
 
-Each section of the FSCTE needs to be in their own separate environment, so that
-if some error occurs, it impacts only that specific section and not the entire
+Each component of the FSCTE needs to be in their own separate environment, so that
+if an error occurs, it impacts only that specific component and not the entire
 FSCTE. Docker was chosen for this purpose, since it is relatively easy to spin
-up a section in its own environment and redeploy that section if some error
+up a component in its own environment and redeploy that component if an error
 occurs. \\
 
 The docker container is created by writing a \texttt{Dockerfile} that
@@ -156,14 +156,14 @@ perform relative to other players in the same tournaments. \\
 
 The lecturers, or admins, are able to upload their own rankers, schedulers,
 referees and players to the web user interface. More will be explained about the
-rankers, schedulers and referees in chapter \ref{sec:impl-tab-components}. The
-admins can also add their own players to public or private tournaments, as well
-as they can add a student's player to a public or private tournament. The admins
-can start and stop tournaments, as well as create new tournaments. \\
+rankers, schedulers and referees in section \ref{sec:impl-tab-components}. The
+admins can add their own players, as well as a student's player, to a public or
+private tournament. The admins can start and stop tournaments, as well as create
+new tournaments. \\
 
 After a match has completed, either ending in a failure or success, the log files
-of that match can be accessed if the student or admin desires. This means that
-either the student or admin can see what moves both the players made and the
+of that match can be accessed by both students and admins. This means that
+either the student or admin can see what moves the players made and the
 final result of the match.
 
 \section{Software Stack}
@@ -193,6 +193,8 @@ check if docker and docker-compose are available in the setup script. If one or
 more programs are not installed, the script will download the necessary version
 onto the host machine.
 
+\section{Documentation}
+
 \chapter{Design and Implementation}
 \label{chap:design}
 
@@ -201,28 +203,31 @@ present in the FSCTE. Figure \ref{fig:uml-structure} shows an overview of the
 components present in the FSCTE and how they interact.
 \begin{figure}[H]
 	\centering
-	\includegraphics[scale=0.25]{uml-structure.png}
-	\caption{UML diagram representing the structure of the FSCTE}
+	\includegraphics[scale=0.238]{uml-structure.png}
+	\caption{UML diagram representing the structure of the FSCTE. Rectangles
+	with a solid blue outline represent docker containers, rectangles with a
+	dotted orange line represent entities inside the docker containers and dotted
+	grey lines represent the docker container in which an entity resides.}
 	\label{fig:uml-structure}
 \end{figure}
 
 \section{Overview}
 \label{sec:impl-overview}
 
-This section serves as an explanation for what can be seen in the UML diagram in
-Figure \ref{fig:uml-structure}. \\
+This section provides an explanation for what can be seen in the UML diagram
+depicted in Figure \ref{fig:uml-structure}. \\
 
 The actor represents a user, who can be either an admin or student. This user
-only interacts with the web user interface to add players, tournaments and anything
-the user desires, provided they have the correct permissions. There is a
-difference between a user and a player, where the user is the person who is
-currently logged in (student or admin) and the player is an executable that the
-user uploads to take part in tournaments. As such, a single user can have many
-players. \\
+only interacts with the web user interface to add players, tournaments etc.,
+provided they have the correct permissions. There is a difference between a
+user and a player, where the user is the person who is currently logged in
+(student or admin) and the player is an executable that the user uploads to take
+part in tournaments. As such, a single user can have many players. \\
 
-The rectangles with a blue outline represent docker containers and the rectangles
-with a dotted orange line represent entities inside the docker containers. The
-dotted grey line represents the docker container in which an entity resides.
+The rectangles with a solid blue outline represent docker containers and the
+rectangles with a dotted orange line represent entities inside the docker
+containers. The dotted grey line represents the docker container in which an
+entity resides.
 
 \section{Web User Interface}
 \label{sec:impl-web-interface}
@@ -238,9 +243,9 @@ so that the content of the page changes without having to re-render the elements
 that are present in both pages. As such, the performance of a SPA is significantly
 better than a traditional web app because of the reduced rendering needed to
 display different pages. Vue\footnote{\url{https://vuejs.org/}} was chosen as the
-framework to use because it is extremely easy to use and provides support for
-creating a SPA. An example of the login screen for the web user interface can be
-seen in Figure \ref{fig:login} in the Appendix. \\
+framework to use because it is easy to use and provides support for creating a
+SPA. An example of the login screen for the web user interface can be seen in
+Figure \ref{fig:login} in the Appendix. \\
 
 The web user interface makes use of cookies to store the session, so that the
 user stays logged in even when closing the web user interface browser tab. The
@@ -254,13 +259,13 @@ regularly updated. \\
 The web user interface consists of different tabs that a user can click to navigate
 to different views. The tabs that can be accessed vary depending on the level of
 permission of the logged in user, i.e. admins will be able to access more tabs
-than students will be able to. However, some tabs are accessible regardless of
-if a user is logged in or not. These tabs are the `Tournaments' tab, `Matches'
-tab, `Standings' tab and finally the `About' tab. If user logs in as a student,
-the user is able to access the `Players' tab as well as all of the tabs
-accessible when not logged in. If the user logs in as an admin, the user is able
-to access the `Components' tab as well as all of the tabs accessible to a student.
-The above tabs will be explained in further detail from section
+than students will be able to. However, some tabs are accessible whether a user
+is logged in or not. These tabs are the `Tournaments' tab, `Matches' tab,
+`Standings' tab and finally the `About' tab. If user logs in as a student, the
+user is able to access the `Players' tab as well as all of the tabs accessible
+when not logged in. If the user logs in as an admin, the user is able to access
+the `Components' tab as well as all of the tabs accessible to a student. The
+above tabs will be explained in further detail in sections
 \ref{sec:impl-tab-tournaments} to \ref{sec:impl-tab-about}.
 
 \subsection{`Tournaments' tab}
@@ -289,9 +294,9 @@ user can see the type of the tournament (either public or private), the status
 of the tournament, the maximum time limit per move, the referee used, the scheduler
 used and the ranker used. The user can also see the player names of the current
 players in the tournament. The ranker, scheduler and referee will be explained
-in detail from section \ref{sec:ranker} to \ref{sec:referee}. \\
+in detail in sections \ref{sec:ranker} to \ref{sec:referee}. \\
 
-A table showing the current players participating the selected tournament is
+A table showing the current players participating in the selected tournament is
 present at the bottom of the selected tournament information page. The user can
 see the player names, not the names of the users, of all the players participating
 in the selected tournament.
@@ -339,7 +344,7 @@ the entire tournament if the user wishes.
 The `Matches' tab is accessible by a user who is not logged in, a student
 and an admin. A screenshot of the page after clicking the tab can be seen in
 Figure \ref{fig:matches-student} in the Appendix, when logged in as a student,
-and the page is the same for when logged in as an admin or when not logged in.
+and the page is the same when logged in as an admin or when not logged in.
 There is no difference in functionality for matches when not logged in,
 logged in as a student or logged in as an admin, because the matches are
 automatically generated when a tournament is started. \\
@@ -352,11 +357,11 @@ the matches were played. The matches are displayed in a table, which shows the
 ID of the match, the players that participated in the match, the status of the
 match and the winner of that match. When clicking on a specific match ID, the user
 is redirected to a page that displayed the status of the match, the winner and a
-message extracted from the log files. The message gives extra information about
-whether an error occurred or, if the match finished successfully, the message will
-display the new rating of the two players. There are also buttons at the bottom
-of the match information page that allow the user to download each players log
-files, as well as the referee log files.
+message extracted from the log files. The message displays any errors that have
+occurred or, if the match finished successfully, the new rating of the two
+players. There are also buttons at the bottom of the match information page that
+allow the user to download each player's log files, as well as the referee log
+files.
 
 \subsection{`Players' tab}
 \label{sec:impl-tab-players}
@@ -364,12 +369,12 @@ files, as well as the referee log files.
 The `Players' tab is only accessible by a user who is a student or an admin. A
 screenshot of the page after clicking the tab can be seen in Figure
 \ref{fig:matches-student} in the Appendix, when logged in as a student, and the
-page is the same for when logged in as an admin or when not logged in. There is
-no difference in functionality for when a user is logged in as a student or an
+page is the same when logged in as an admin or when not logged in. There is
+no difference in functionality when a user is logged in as a student or an
 admin. \\
 
-The players that the logged in user has uploaded is displayed in a table, where
-the name of the players are displayed. There is also a button that allows the
+The players that the logged in user has uploaded are displayed in a table, where
+the names of the players are displayed. There is also a button that allows the
 user to delete any player they have uploaded, which also removes the player from
 any tournaments that it is taking part in. If the user has uploaded players, an
 additional section is displayed that shows in which tournaments each player is
@@ -384,7 +389,7 @@ Figure \ref{fig:players-student} in the Appendix.
 The `Standings' tab is accessible by a user who is not logged in, a student
 and an admin. A screenshot of the page after clicking the tab can be seen in
 Figure \ref{fig:standings-admin} in the Appendix, when logged in as an admin,
-and the page is the same for when logged in as a student or when not logged in.
+and the page is the same when logged in as a student or when not logged in.
 There is no difference in functionality for the standings when not logged in,
 logged in as a student or logged in as an admin, because the standings are
 automatically generated when the matches finish. \\
@@ -422,7 +427,7 @@ tournament.
 The `About' tab is accessible by a user who is not logged in, a student
 and an admin. A screenshot of the page after clicking the tab can be seen in
 Figure \ref{fig:about-admin} in the Appendix, when logged in as an admin,
-and the page is the same for when logged in as a student or when not logged in.
+and the page is the same when logged in as a student or when not logged in.
 There is no difference in functionality for the about page when not logged in,
 logged in as a student or logged in as an admin, because it is a static page
 that doesn't rely on any generated information. \\
@@ -436,15 +441,15 @@ This section serves as an explanation for the purpose of the REST API docker
 container seen in Figure \ref{fig:uml-structure}. \\
 
 The REST API is written in Python 3.7 and Flask\footnote{\url{https://flask.palletsprojects.com/en/1.1.x/}}
-because it is very easy to set up. It runs in its own docker container and is
+because it is easy to set up. It runs in its own docker container and is
 available on port 5000. The API allows for file upload to and download from the
 web user interface, as well as providing access points for CAS authentication. \\
 
-File uploading is used for when a user uploads their player using the web user
+File uploading is used when a user uploads their player using the web user
 interface. The file is selected from the user's operating system and uploaded
 to the system that is hosting the web user interface. The path to the player
 is stored in the database so that the player files can be retrieved when needed.
-File downloading is used for when a user wants to download the log files after
+File downloading is used when a user wants to download the log files after
 a match has finished. The path to the match log is generated by taking the
 tournament name and player name of the requested file, then finding the file on
 the system hosting the web user interface and finally downloading it to the user's
@@ -530,18 +535,18 @@ The following endpoints are available for access through the REST API:
 
 \section{Database}
 
-This section serves as an explanation for the purpose of the database docker
-container seen in Figure \ref{fig:uml-structure}. \\
+This section serves as an explanation of the database docker container seen in
+Figure \ref{fig:uml-structure}. \\
 
 Neo4j\footnote{\url{https://neo4j.com/}} was chosen as the backend database
-because the main advantage is the fact that it is a graph database. Graph databases,
-such as Neo4j, differ from relational databases, such as SQL, in how they connect
-data. Neo4j uses nodes and relationships to connect data, whereas SQL uses
-primary and foreign keys. The data that the system uses benefits greatly from
-using relationships between nodes to describe the data, since, for example, a user
-can have many players (relationship is user to player) that participate in many
-tournaments (relationship is user to player to tournament). Such data would require
-multiple foreign keys and get very complicated very quickly. \\
+because it is a graph database. Graph databases, such as Neo4j, differ from
+relational databases, such as SQL, in how they connect data. Neo4j uses nodes
+and relationships to connect data, whereas SQL uses primary and foreign keys.
+The data that the system uses benefits greatly from using relationships between
+nodes to describe the data, since, for example, a user can have many players
+(relationship is user to player) that participate in many tournaments (relationship
+is user to player to tournament). Such data would require multiple foreign keys
+and get very complicated very quickly. \\
 
 Neo4j uses the Cypher query language in order to write queries for the data in
 the database. The Cypher query language closely resembles English, making it easy
@@ -558,15 +563,15 @@ This section serves as an explanation for the purpose of the database watcher
 docker container seen in Figure \ref{fig:uml-structure}. \\
 
 The database watcher was written in Golang because it is a language that handles
-concurrency very well, since the first version was released recently, March 2012
-\cite{golang}, and has concurrency at its core. Golang is being updated frequently,
-with the newest version being released in August 2020. Golang also has multiple
-advantages over Java, such as:
+concurrency very well, it is a fairly new language (first version was released
+in March 2012 \cite{golang}), and has concurrency at its core. Golang is being
+updated frequently, with the newest version being released in August 2020. Golang
+also has multiple advantages over Java, such as:
 \begin{itemize}
 	\item Low overhead, since Golang does not use the Java Virtual Machine.
-	\item Concurrency is built into the core language and simple to use compared
-	to Java threads.
-	\item Faster performance when compared to Java.
+	\item Concurrency is built into the core language, in the form of \texttt{goroutines},
+	and is simpler to use than Java threads.
+	\item Overall application performance is better than Java.
 \end{itemize}
 The above advantages are the reason that Golang was chosen over Java for writing
 the database watcher. \\
@@ -576,23 +581,22 @@ set interval. The main change that the database watcher is looking for is when a
 tournament is started or stopped. When this change occurs, the database watcher
 retrieves the name of the tournament and retrieves the ranker, scheduler, referee
 and players that are participating in that tournament. Information about the
-ranker, scheduler and referee is given from section \ref{sec:ranker} to
+ranker, scheduler and referee is given in sections \ref{sec:ranker} to
 \ref{sec:referee}.
 
 \subsection{Ranker}
 \label{sec:ranker}
 
-The ranker is used to distinguish between the good and bad players by comparing
-the rating of the two players, where every player starts on the same rating.
-For every win that a player has, their rating increases by some amount and
-for every loss that a player has, their rating decreases by some amount. The
-amount gained or lost decreases for every match that the player plays, meaning
-that eventually the rating will be a true reflection of the skill level of the
-player. \\
+Every player starts on the same rating and the ranker updates these ratings
+after every match. For every win that a player has, their rating increases by
+an amount and for every loss that a player has, their rating decreases by
+an amount. The amount gained or lost decreases for every match that the player
+plays, meaning that eventually the rating will be a true reflection of the skill
+level of the player. \\
 
-The ranker needs to be written in Golang so that it can integrate into the database
-watcher and the specification for writing the ranker can be found at
-\url{https://git.cs.sun.ac.za/20703236/fscte-docs/-/blob/master/guidelines/Ranker.md}.
+New rankers can be added, but they need to be written in Golang so that it can
+integrate into the database watcher. The specification for writing a ranker can
+be found at \url{https://git.cs.sun.ac.za/20703236/fscte-docs/-/blob/master/guidelines/Ranker.md}.
 An example of a ranker that uses the Elo \cite{elo} rating system can be found in
 the \texttt{mock-data} directory in the root of the FSCTE repository and it is
 called \texttt{EloRanker.go}.
@@ -600,17 +604,16 @@ called \texttt{EloRanker.go}.
 \subsection{Scheduler}
 \label{sec:scheduler}
 
-The scheduler is used to schedule matches between two players that play against
-each other in order to see who is the better player. After every player
-has played against every other player in the tournament, the overall win-loss
-ratio for that tournament can be calculated, which can then be used to
-distinguish between good, average and bad players. The win-loss ratio and the
-rating system can be used in conjunction to organize fair matches between players
-are of a similar skill level. \\
+The scheduler schedules matches between pairs of players in a tournament, such
+that the players of the tournament can be ranked. After every player has played
+against every other player in the tournament, the overall win-loss ratio for
+that tournament can be calculated, which can then be used to rank players. The
+win-loss ratio and the rating system can be used in conjunction to organize fair
+matches between pairs of players who are of a similar skill level. \\
 
-The scheduler needs to be written in Golang so that it can integrate into the
-database watcher and the specification for writing the scheduler can be found at
-\url{https://git.cs.sun.ac.za/20703236/fscte-docs/-/blob/master/guidelines/Scheduler.md}
+New schedulers can be added, but they need to be written in Golang so that it
+can integrate into the database watcher. The specification for writing a scheduler
+can be found at \url{https://git.cs.sun.ac.za/20703236/fscte-docs/-/blob/master/guidelines/Scheduler.md}
 An example of a scheduler that uses a round-robin strategy to organize matches
 between players can be found in the \texttt{mock-data} directory in the root of
 the FSCTE repository and it is called \texttt{RoundRobin.go}.
@@ -618,11 +621,11 @@ the FSCTE repository and it is called \texttt{RoundRobin.go}.
 \subsection{Referee}
 \label{sec:referee}
 
-The referee is used to monitor the moves that the two players make in a match and
-check if any player makes an invalid move or times out. One player sends a
+The referee monitors the moves that the two players make in a match and
+checks if any player makes an invalid move or times out. One player sends a
 move to the referee, which then checks if the move is valid and only sends
 the move to the other player if the move made is valid. If the move made is
-invalid, or the player times out, the match will be forfeit and the last player
+invalid, or the player times out, the match will be forfeited and the last player
 to send a valid move becomes the winner. \\
 
 The referee needs to be a \texttt{JAR} file that is compatible with a game type
@@ -655,7 +658,7 @@ container. The players are then connected to the match server and play against
 each other by sending their moves to the referee, which verifies if the moves are
 valid and if they are valid, then the referee sends the move to the other player.
 This process continues until either a player sends an invalid move or the game
-is played out until completion. The log files of each player are stored and the
+has been played to completion. The log files of each player are stored and the
 path to the log files are added to the database so that each player log file can
 be downloaded at a later stage using the web user interface.
 
@@ -778,7 +781,7 @@ This section describes the integration testing performed on the FSCTE system.
 
 \subsection{Tournaments running concurrently}
 
-It is a requirements that the tournaments are able to be run concurrently, so
+It is a requirement that the tournaments are able to be run concurrently, so
 that no tournament needs to wait for another tournament to finish before another
 can start. Golang was useful here because of the built-in concurrency it brings
 and the concurrent tournaments were tested by starting multiple tournaments at
@@ -808,8 +811,8 @@ to add Kubernetes to the current FSCTE.
 
 In the current FSCTE implementation, only the \texttt{Othello} game is supported.
 Supporting other game types will allow the FSCTE to be more abstract and versatile.
-Due to time constraints, it was not feasible to attempt to support other types
-of games.
+However, this was outside of the scope of this project and it was not feasible
+to attempt to support other types of games.
 
 \chapter{Conclusion}
 \label{chap:conclusion}
@@ -823,17 +826,17 @@ The main requirements of the FSCTE that needed to be satisfied were:
 	\item have a more user-friendly web user interface
 \end{itemize}
 All of the above requirements were satisfied. The error handling requirement
-was satisfied by making sure that at any point where an error could occur, it
-was decided if the error was serious or not. If the error was serious, then an
-error message would be displayed and the component that caused the error would
-be stopped. If the error was not serious, then an error message would be displayed,
-but nothing would happen to the component that caused the error. \\
+was satisfied by making sure that at any point where an error can occur, it
+is determined whether the error is serious or not. If the error is serious, then
+an error message is displayed and the component that caused the error is stopped.
+If the error is not serious, then an error message is displayed, but nothing
+happens to the component that caused the error. \\
 
 The effective debugging facilities requirement was satisfied by logging all
-information that happens inside each docker container, so that if some error
-occurs, the user can look in the docker logs to see at which stage the error
-occurred. This allows the user to know exactly what was going on before the
-error occurred so that the user can pinpoint the issue and fix the problem. \\
+information that happens inside each docker container, so that if an error
+occurs, the user can search through the docker logs to see at which stage the
+error occurred. This allows the user to know exactly what was going on before
+the error occurred so that the user can pinpoint the issue and fix the problem. \\
 
 The tournaments and player scaling requirement was satisfied by writing the
 code base in such a way that it performs very well for any number of tournaments
@@ -847,7 +850,8 @@ can understand what is going on without any issue. \\
 The user-friendly web user interface requirement was satisfied by ensuring that
 the user can navigate to any page or get any information they want in a maximum
 of two mouse clicks. A lot of time was spent making sure that the web user
-interface looked clean and visually appealing, as well as easy to use. \\
+interface looked clean and visually appealing, as well as easy to use. It was
+important to make sure that there was a simple, logical path to each page. \\
 
 Working on the FSCTE for the past year has been a great challenge, but also a
 great reward. Initially, it was tough to understand what was going on in the CTE
