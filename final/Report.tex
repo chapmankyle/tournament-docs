@@ -8,6 +8,8 @@
 \usepackage{geometry}
 \usepackage{graphicx}
 \usepackage{hyperref}
+\usepackage{array}
+\usepackage{chngpage}
 
 \addbibresource{References.bib}
 \graphicspath{ {images/} }
@@ -156,7 +158,7 @@ perform relative to other players in the same tournaments. \\
 
 The lecturers, or admins, are able to upload their own rankers, schedulers,
 referees and players to the web user interface. More will be explained about the
-rankers, schedulers and referees in section \ref{sec:impl-tab-components}. The
+rankers, schedulers and referees in Section \ref{sec:impl-tab-components}. The
 admins can add their own players, as well as a student's player, to a public or
 private tournament. The admins can start and stop tournaments, as well as create
 new tournaments. \\
@@ -220,8 +222,8 @@ components present in the FSCTE and how they interact.
 \section{Overview}
 \label{sec:impl-overview}
 
-This section provides an explanation for what can be seen in the UML diagram
-depicted in Figure \ref{fig:uml-structure}. \\
+This section provides an explanation of the UML diagram depicted in Figure
+\ref{fig:uml-structure}. \\
 
 The actor represents a user, who can be either an admin or student. This user
 only interacts with the web user interface to add players, tournaments etc.,
@@ -267,11 +269,11 @@ to different views. The tabs that can be accessed vary depending on the level of
 permission of the logged in user, i.e. admins will be able to access more tabs
 than students will be able to. However, some tabs are accessible whether a user
 is logged in or not. These tabs are the `Tournaments' tab, `Matches' tab,
-`Standings' tab and finally the `About' tab. If user logs in as a student, the
+`Standings' tab and finally the `About' tab. If a user logs in as a student, the
 user is able to access the `Players' tab as well as all of the tabs accessible
 when not logged in. If the user logs in as an admin, the user is able to access
 the `Components' tab as well as all of the tabs accessible to a student. The
-above tabs will be explained in further detail in sections
+above tabs will be explained in further detail in Sections
 \ref{sec:impl-tab-tournaments} to \ref{sec:impl-tab-about}.
 
 \subsection{`Tournaments' tab}
@@ -300,7 +302,7 @@ user can see the type of the tournament (either public or private), the status
 of the tournament, the maximum time limit per move, the referee used, the scheduler
 used and the ranker used. The user can also see the player names of the current
 players in the tournament. The ranker, scheduler and referee will be explained
-in detail in sections \ref{sec:ranker} to \ref{sec:referee}. \\
+in detail in Sections \ref{sec:ranker} to \ref{sec:referee}. \\
 
 A table showing the current players participating in the selected tournament is
 present at the bottom of the selected tournament information page. The user can
@@ -436,10 +438,9 @@ Figure \ref{fig:about-admin} in the Appendix, when logged in as an admin,
 and the page is the same when logged in as a student or when not logged in.
 There is no difference in functionality for the about page when not logged in,
 logged in as a student or logged in as an admin, because it is a static page
-that doesn't rely on any generated information. \\
-
-The about page describes the types of tournaments that the user can see and
-gives an overview of what the ranker, referee and scheduler mean.
+that doesn't rely on any generated information. This page describes the types of
+tournaments that the user can see and gives an overview of what the ranker,
+referee and scheduler mean.
 
 \section{REST API}
 
@@ -461,83 +462,55 @@ tournament name and player name of the requested file, then finding the file on
 the system hosting the web user interface and finally downloading it to the user's
 system. \\
 
-The CAS authentication is used to allow students and lecturers to log into the
-web user interface using their Stellenbosch University credentials. When the
-user clicks the `SU Login' button on the Login page of the web user interface,
-they are redirected to the Single-Sign On page that Stellenbosch uses for
-authentication. If the username and password provided is correct, a ticket gets
-returned to the REST API, which then gets validated. If the ticket is valid, then
-the username is returned to the REST API. If the ticket is not valid, then no
-username is returned. After the validation process, the ticket is invalidated so
-that it cannot be used again. Once the REST API has the username of the user,
-it passes the username back to the web user interface, which checks if the username
-is that of a student or admin. It performs this check by looking at the username,
-where the username of a student is made up of all numbers and the username of
-a lecturer is made up of characters. This user is then added to the database so
-that the players associated with the user can be stored in the database. \\
+Stellenbosch University uses Central Authentication Service (CAS) to allow
+students to log into any of the Stellenbosch University web pages. CAS
+authentication takes in the username and password of a user and returns a ticket,
+which is then validated by the CAS REST API endpoint. If the username and password
+combination is valid, various information about the user is returned. The ticket is
+then invalidated so that it cannot be used again. If the username and password
+combination is not valid, the ticket is invalidated and no information about the
+user is returned. The ticket used by CAS is only valid for a certain period of
+time, after which the ticket is invalidated. This is to ensure that one ticket
+cannot be used for multiple login attempts. \\
+
+The REST API used for the FSCTE is responsible for handling CAS authentication.
+The web user interface is where the user can enter their Stellenbosch University
+username and password, which then gets passed to the FSCTE REST API. This REST
+API then passes the username and password to CAS, which creates a ticket and
+performs validation on that ticket. If the username and password combination is
+valid, the FSCTE REST API receives the student number of the user and the user
+is logged into the web user interface. If the username and password combination
+is not valid, CAS redirects the user to the login page where the user can try again.
+The student number of the user is used by the web user interface to create a user
+in the database and determine which permissions to give the user. The student number
+of a student is made up of all numbers, whereas the student number of a lecturer
+is made up of characters, which is useful to determine the permission of the user. \\
 
 The following endpoints are available for access through the REST API:
-\subsubsection*{\texttt{/check}}
-\begin{itemize}
-	\item \textbf{Usage}: Ensures the REST API is accessible.
-	\item \textbf{Methods}: \texttt{GET}
-	\item \textbf{Returns}:
-	\begin{verbatim}
-		{ "message": "Connected successfully" }
-	\end{verbatim}
-\end{itemize}
-\subsubsection*{\texttt{/login}}
-\begin{itemize}
-	\item \textbf{Usage}: Attempts to log the user in using Stellenbosch
-	University credentials.
-	\item \textbf{Methods}: \texttt{GET}
-	\item \textbf{Returns}:
-	\begin{verbatim}
-		{
-		    "username": <username>,
-		    "ticket": <ticket>
-		}
-	\end{verbatim}
-\end{itemize}
-\subsubsection*{\texttt{/clear}}
-\begin{itemize}
-	\item \textbf{Usage}: Logs the Stellenbosch University user out. The logout
-	route could not be \texttt{/logout}, since the CAS authentication logout route
-	was \texttt{/logout} and various variables needed to be cleared before logging
-	the user out.
-	\item \textbf{Methods}: \texttt{GET}
-	\item \textbf{Returns}: \texttt{None}
-\end{itemize}
-\subsubsection*{\texttt{/upload/<fileType>/<fileName>}}
-\begin{itemize}
-	\item \textbf{Usage}: Uploads a \texttt{fileType} called \texttt{fileName}
-	to the web user interface local system. The \texttt{fileType} can be either
-	a referee, ranker, scheduler or player and the \texttt{fileName} is the name
-	of the file to upload.
-	\item \textbf{Methods}: \texttt{POST}
-	\item \textbf{Returns}:
-	\begin{verbatim}
-		{ "message" : "File successfully uploaded" }
-	\end{verbatim}
-\end{itemize}
-\subsubsection*{\texttt{/download/<tournamentName>/<fileName>}}
-\begin{itemize}
-	\item \textbf{Usage}: Downloads the log file called \texttt{fileName} from
-	the tournament \texttt{tournamentName}.
-	\item \textbf{Methods}: \texttt{GET}
-	\item \textbf{Returns}: \texttt{File} object.
-\end{itemize}
-\subsubsection*{\texttt{/remove/<fileType>/<fileName>}}
-\begin{itemize}
-	\item \textbf{Usage}: Removes a \texttt{fileType} called \texttt{fileName}
-	from the web user interface's local system, if it exists. Mainly used when
-	a user deletes a player.
-	\item \textbf{Methods}: \texttt{GET}
-	\item \textbf{Returns}:
-	\begin{verbatim}
-		{ "message" : "Successfully deleted file" }
-	\end{verbatim}
-\end{itemize}
+\begin{table}[H]
+	\begin{adjustwidth}{-.5in}{-.5in}
+		\centering
+		\begin{tabular}{|m{5cm}|m{6cm}|m{1.7cm}|m{1.95cm}|}
+			\hline
+			\textbf{Endpoint} & \textbf{Usage} & \textbf{Methods} & \textbf{Returns} \\
+			\hline
+			\texttt{/check} & Ensures the REST API is accessible & \texttt{GET} & \texttt{message} \\
+			\hline
+			\texttt{/login} & Attempts to log the user in using Stellenbosch University credentials & \texttt{GET} & \texttt{username} and \texttt{ticket} \\
+			\hline
+			\texttt{/clear} & Logs the Stellenbosch University user out & \texttt{GET} & \texttt{None} \\
+			\hline
+			\texttt{/upload/<type>/<name>} & Uploads a file \texttt{type} (either referee, ranker, scheduler or player) called \texttt{name} to the web user interface local system & \texttt{POST} & \texttt{message} \\
+			\hline
+			\texttt{/download/<tName>/<fName>} & Downloads the log file called \texttt{fName} from the tournament \texttt{tName} & \texttt{GET} & \texttt{File} object \\
+			\hline
+			\texttt{/remove/<type>/<name>} & Removes a file \texttt{type} called \texttt{name} from the web user interface's local system & \texttt{GET} & \texttt{message} \\
+			\hline
+		\end{tabular}
+		\caption{Endpoints accessible through the FSCTE REST API}
+		\label{tab:enpoints}
+	\end{adjustwidth}
+\end{table}
 
 \section{Database}
 
@@ -554,11 +527,11 @@ nodes to describe the data, since, for example, a user can have many players
 is user to player to tournament). Such data would require multiple foreign keys
 and get very complicated very quickly. \\
 
-Neo4j uses the Cypher query language in order to write queries for the data in
-the database. The Cypher query language closely resembles English, making it easy
-to write complicated queries and return exactly the data that is needed. Database
-drivers were written in both TypeScript, for the web user interface, and Golang,
-for the database watcher. The database drivers allowed the web user interface
+Neo4j queries are written using the Cypher query language, which closely
+resembles English, therefore making it easy to write complicated queries and
+return exactly the data that is needed. The database driver for the web user
+interface was written in TypeScript and the database driver for the database
+watcher was written in Golang. The database drivers allowed the web user interface
 and the database watcher to add, edit, delete and retrieve data from the
 database. An example of the graph database can be seen in Figure \ref{fig:database}
 in the Appendix.
@@ -587,14 +560,14 @@ set interval. The main change that the database watcher is looking for is when a
 tournament is started or stopped. When this change occurs, the database watcher
 retrieves the name of the tournament and retrieves the ranker, scheduler, referee
 and players that are participating in that tournament. Information about the
-ranker, scheduler and referee is given in sections \ref{sec:ranker} to
+ranker, scheduler and referee is given in Sections \ref{sec:ranker} to
 \ref{sec:referee}.
 
 \subsection{Ranker}
 \label{sec:ranker}
 
-Every player starts on the same rating and the ranker updates these ratings
-after every match. For every win that a player has, their rating increases by
+The ranker updates the ratings of players after every match and every player starts
+on the same rating. For every win that a player has, their rating increases by
 an amount and for every loss that a player has, their rating decreases by
 an amount. The amount gained or lost decreases for every match that the player
 plays, meaning that eventually the rating will be a true reflection of the skill
@@ -688,8 +661,8 @@ every unit of the system works as intended, and also allows future developers to
 see if any change they make breaks existing functionality or not. The individual
 units of the system need to be tested, but the integration between the units and
 the system as a whole also needs to be tested. The unit testing will be discussed
-in section \ref{sec:unit-test} and the integration testing will be discussed in
-section \ref{sec:integ-test}.
+in Section \ref{sec:unit-test} and the integration testing will be discussed in
+Section \ref{sec:integ-test}.
 
 \section{Unit Testing}
 \label{sec:unit-test}
@@ -804,7 +777,7 @@ were the exact same, hence the concurrent tournaments worked as expected.
 
 This chapter covers the future work that could be implemented in the Fail-Safe
 Cloud Tournament Engine (FSCTE) to extend the current functionality. The
-conclusion will be provided in section \ref{chap:conclusion}.
+conclusion will be provided in Section \ref{chap:conclusion}.
 
 \section{Kubernetes}
 
